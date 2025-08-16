@@ -71,13 +71,26 @@ if st.session_state.logged_in:
     # TAB 1 - Milk Records
     with tab1:
         st.header("🥛 Milk Records")
-        df_milk = fetch_data("Milk_Records")
-        if not df_milk.empty:
-            st.dataframe(df_milk)
-        else:
-            st.info("No Milk Records found.")
 
-    # TAB 2 - Farmer Registration
+        # RFID Search
+        search_rfid = st.text_input("🔍 Enter RFID Number to Search")
+        if st.button("Search by RFID"):
+            if search_rfid.strip():
+                df_milk = fetch_data("Milk_Records")
+                df_milk = df_milk[df_milk["RFID_no"] == search_rfid.strip()]
+                if not df_milk.empty:
+                    st.dataframe(df_milk.sort_values(by="Date", ascending=False))
+                else:
+                    st.warning(f"No records found for RFID: {search_rfid}")
+            else:
+                st.error("Please enter RFID number before searching.")
+        else:
+            # Default view - show all records
+            df_milk = fetch_data("Milk_Records")
+            if not df_milk.empty:
+                st.dataframe(df_milk.sort_values(by="Date", ascending=False))
+            else:
+                st.info("No Milk Records found.")    # TAB 2 - Farmer Registration
     with tab2:
         st.header("📝 Farmer Registration Form")
 
