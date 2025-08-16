@@ -78,7 +78,7 @@ if st.session_state.logged_in:
         IFSC_code = st.text_input("IFSC Code")
 
         # Cattle type checkboxes
-        st.markdown("### Select Cattle Type")
+        st.markdown("Select Cattle Type")
         cattle_buffalo = st.checkbox("Buffalo")
         cattle_cow = st.checkbox("Cow")
 
