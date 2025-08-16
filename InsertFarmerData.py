@@ -34,8 +34,8 @@ def insert_farmer(data):
         cursor = conn.cursor()
 
         sql = """INSERT INTO Farmers_data 
-                 (adhar_no, farmer_name, address, mobile_no, email, password, bank, account_no, IFSC_code, cattle_type)
-                 VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
+                 (RFID_no, adhar_no, farmer_name, address, mobile_no, email, password, bank, account_no, IFSC_code, cattle_type)
+                 VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
 
         cursor.execute(sql, data)
         conn.commit()
@@ -95,6 +95,7 @@ if st.session_state.logged_in:
         st.header("📝 Farmer Registration Form")
 
         with st.form("farmer_form"):
+            RFID_no = st.text_input("RFID Number")
             adhar_no = st.text_input("Aadhar No (12 digits)")
             farmer_name = st.text_input("Farmer Name")
             address = st.text_area("Address")
@@ -140,7 +141,7 @@ if st.session_state.logged_in:
                 elif not cattle_type:
                     st.error("Please select at least one cattle type")
                 else:
-                    data = (adhar_no, farmer_name, address, mobile_no, email, password1, bank, account_no, IFSC_code, cattle_type)
+                    data = (RFID_no, adhar_no, farmer_name, address, mobile_no, email, password1, bank, account_no, IFSC_code, cattle_type)
                     if insert_farmer(data):
                         st.success("✅ Farmer record inserted successfully!")
 
