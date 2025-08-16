@@ -89,10 +89,16 @@ if st.session_state.logged_in:
             SELECT m.id, m.RFID_No, f.farmer_name, m.date, m.quantity, m.fat, m.amount
             FROM Milk_Records m
             JOIN Farmers_data f ON m.RFID_No = f.RFID_No
-            WHERE (%s IS NULL OR m.RFID_No = %s)
-            ORDER BY m.date DESC
         """
-        cursor.execute(query, (search_rfid if search_rfid else None, search_rfid if search_rfid else None))
+        params = ()
+        
+        if search_rfid:
+            query += " WHERE m.RFID_No = %s"
+            params = (search_rfid,)
+        
+        query += " ORDER BY m.date DESC"
+        
+        cursor.execute(query, params)
 
         data = cursor.fetchall()
         conn.close()
