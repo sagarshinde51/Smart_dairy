@@ -92,7 +92,7 @@ if st.session_state.logged_in:
             WHERE (%s IS NULL OR m.RFID_No = %s)
             ORDER BY m.date DESC
         """
-        cursor.execute(query, (search_rfid if search_rfid else None, search_rfid if search_rfid else None))        else:
+        cursor.execute(query, (search_rfid if search_rfid else None, search_rfid if search_rfid else None))
 
         data = cursor.fetchall()
         conn.close()
