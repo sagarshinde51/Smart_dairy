@@ -85,23 +85,14 @@ if st.session_state.logged_in:
         conn = get_connection()
         cursor = conn.cursor(dictionary=True)
 
-        if search_rfid:
-            query = """
-                SELECT m.id, m.RFID_No, f.farmer_name, m.date, m.quantity, m.fat, m.amount
-                FROM Milk_Records m
-                JOIN Farmers_data f ON m.RFID_No = f.RFID_No
-                WHERE m.RFID_No = %s
-                ORDER BY m.date DESC
-            """
-            cursor.execute(query, (search_rfid,))
-        else:
-            query = """
-                SELECT m.id, m.RFID_No, f.farmer_name, m.date, m.quantity, m.fat, m.amount
-                FROM Milk_Records m
-                JOIN Farmers_data f ON m.RFID_No = f.RFID_No
-                ORDER BY m.date DESC
-            """
-            cursor.execute(query)
+        query = """
+            SELECT m.id, m.RFID_No, f.farmer_name, m.date, m.quantity, m.fat, m.amount
+            FROM Milk_Records m
+            JOIN Farmers_data f ON m.RFID_No = f.RFID_No
+            WHERE (%s IS NULL OR m.RFID_No = %s)
+            ORDER BY m.date DESC
+        """
+        cursor.execute(query, (search_rfid if search_rfid else None, search_rfid if search_rfid else None))        else:
 
         data = cursor.fetchall()
         conn.close()
