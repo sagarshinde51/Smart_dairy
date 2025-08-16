@@ -55,6 +55,12 @@ if not st.session_state.logged_in:
 if st.session_state.logged_in:
     st.title("🐄 Farmer Registration Form")
 
+    # Logout button
+    if st.button("🚪 Logout"):
+        st.session_state.logged_in = False
+        st.success("Logged out successfully!")
+        st.rerun()
+
     with st.form("farmer_form"):
         adhar_no = st.text_input("Aadhar No (12 digits)")
         farmer_name = st.text_input("Farmer Name")
