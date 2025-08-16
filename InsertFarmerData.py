@@ -81,34 +81,25 @@ if st.session_state.logged_in:
     with tab1:
         st.header("🥛 Milk Records")
 
-        search_rfid = st.text_input("🔍 Search by RFID Number")
-        conn = get_connection()
-        cursor = conn.cursor(dictionary=True)
-
-        query = """
-            SELECT m.id, m.RFID_No, f.farmer_name, m.date, m.quantity, m.fat, m.amount
-            FROM Milk_Records m
-            JOIN Farmers_data f ON m.RFID_No = f.RFID_No
-        """
-        params = ()
-        
-        if search_rfid:
-            query += " WHERE m.RFID_No = %s"
-            params = (search_rfid,)
-        
-        query += " ORDER BY m.date DESC"
-        
-        cursor.execute(query, params)
-
-        data = cursor.fetchall()
-        conn.close()
-
-        if data:
-            df = pd.DataFrame(data)
-            st.dataframe(df, use_container_width=True)
+        # RFID Search
+        search_rfid = st.text_input("🔍 Enter RFID Number to Search")
+        if st.button("Search by RFID"):
+            if search_rfid.strip():
+                df_milk = fetch_data("Milk_Records")
+                df_milk = df_milk[df_milk["RFID_no"] == search_rfid.strip()]
+                if not df_milk.empty:
+                    st.dataframe(df_milk.sort_values(by="Date", ascending=False))
+                else:
+                    st.warning(f"No records found for RFID: {search_rfid}")
+            else:
+                st.error("Please enter RFID number before searching.")
         else:
-            st.info("No milk records found.")
-    
+            # Default view - show all records
+            df_milk = fetch_data("Milk_Records")
+            if not df_milk.empty:
+                st.dataframe(df_milk.sort_values(by="Date", ascending=False))
+            else:
+                st.info("No Milk Records found.")     
     with tab2:
         st.header("📝 Farmer Registration Form")
 
