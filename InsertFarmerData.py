@@ -72,25 +72,37 @@ if st.session_state.logged_in:
     with tab1:
         st.header("🥛 Milk Records")
 
-        # RFID Search
-        search_rfid = st.text_input("🔍 Enter RFID Number to Search")
-        if st.button("Search by RFID"):
-            if search_rfid.strip():
-                df_milk = fetch_data("Milk_Records")
-                df_milk = df_milk[df_milk["RFID_no"] == search_rfid.strip()]
-                if not df_milk.empty:
-                    st.dataframe(df_milk.sort_values(by="Date", ascending=False))
-                else:
-                    st.warning(f"No records found for RFID: {search_rfid}")
-            else:
-                st.error("Please enter RFID number before searching.")
+        search_rfid = st.text_input("🔍 Search by RFID Number")
+        conn = get_connection()
+        cursor = conn.cursor(dictionary=True)
+
+        if search_rfid:
+            query = """
+                SELECT m.id, m.RFID_No, f.farmer_name, m.date, m.quantity, m.fat, m.amount
+                FROM Milk_Records m
+                JOIN Farmers_data f ON m.RFID_No = f.RFID_No
+                WHERE m.RFID_No = %s
+                ORDER BY m.date DESC
+            """
+            cursor.execute(query, (search_rfid,))
         else:
-            # Default view - show all records
-            df_milk = fetch_data("Milk_Records")
-            if not df_milk.empty:
-                st.dataframe(df_milk.sort_values(by="Date", ascending=False))
-            else:
-                st.info("No Milk Records found.")    # TAB 2 - Farmer Registration
+            query = """
+                SELECT m.id, m.RFID_No, f.farmer_name, m.date, m.quantity, m.fat, m.amount
+                FROM Milk_Records m
+                JOIN Farmers_data f ON m.RFID_No = f.RFID_No
+                ORDER BY m.date DESC
+            """
+            cursor.execute(query)
+
+        data = cursor.fetchall()
+        conn.close()
+
+        if data:
+            df = pd.DataFrame(data)
+            st.dataframe(df, use_container_width=True)
+        else:
+            st.info("No milk records found.")
+    
     with tab2:
         st.header("📝 Farmer Registration Form")
 
