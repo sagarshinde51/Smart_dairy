@@ -76,9 +76,15 @@ if st.session_state.logged_in:
             st.dataframe(df_milk)
         else:
             st.info("No Milk Records found.")
-
-    # TAB 2 - Farmer Registration
     with tab2:
+        st.header("📋 Farmers Data")
+        df_farmers = fetch_data("Farmers_data")
+        if not df_farmers.empty:
+            st.dataframe(df_farmers)
+        else:
+            st.info("No Farmers found.")
+    # TAB 2 - Farmer Registration
+    with tab3:
         st.header("📝 Farmer Registration Form")
 
         # Logout button (shown in all tabs)
@@ -137,11 +143,3 @@ if st.session_state.logged_in:
                     if insert_farmer(data):
                         st.success("✅ Farmer record inserted successfully!")
 
-    # TAB 3 - Farmers Data
-    with tab3:
-        st.header("📋 Farmers Data")
-        df_farmers = fetch_data("Farmers_data")
-        if not df_farmers.empty:
-            st.dataframe(df_farmers)
-        else:
-            st.info("No Farmers found.")
