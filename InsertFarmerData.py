@@ -10,6 +10,15 @@ password = "SagarAtten@12345"
 database = "u263681140_Attendance"
 
 
+def get_connection():
+    return mysql.connector.connect(
+        host="82.180.143.66",
+        user="u263681140_AttendanceInt",
+        password="SagarAtten@12345",
+        database="u263681140_Attendance"
+    )
+
+
 # Function to fetch data from any table
 def fetch_data(table_name):
     try:
