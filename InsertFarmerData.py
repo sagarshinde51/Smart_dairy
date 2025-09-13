@@ -4,7 +4,7 @@ import pandas as pd
 import re
 
 # ----------------- DATABASE CONFIG -----------------
-host = "82.180.143.66"
+host = "82.180.143.52"
 user = "u263681140_AttendanceInt"
 password = "SagarAtten@12345"
 database = "u263681140_Attendance"
