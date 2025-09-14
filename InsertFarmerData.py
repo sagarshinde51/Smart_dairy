@@ -191,15 +191,15 @@ if not st.session_state.logged_in:
                     result = cursor.fetchone()
                     conn.close()
 
+                    #
                     if result:
-                        # ✅ Send mail only if email exists in DB
                         if result["email"]:
-                            recovery_message = f"Hello,\n\nYour Smart Dairy password is: {result['password']}\n\n🐄 Smart Dairy"
-                            smtp_password = st.secrets["brevo_smtp_key"]  # OR ask user input once at top
-                            recipient_email = result["email"]
-
-                            if send_recovery_mail(smtp_password, recipient_email, recovery_message):
-                                st.success(f"✅ Password sent to your registered email: {recipient_email}")
+                            if send_recovery_mail(result["email"], result["password"]):
+                                st.success(f"✅ Password sent to your registered email: {result['email']}")
+                        else:
+                            st.warning("⚠ No email found for this account. Please contact admin.")
+                    
+                        
                         else:
                             st.warning("⚠ No email found for this account. Please contact admin.")
                     else:
