@@ -199,9 +199,6 @@ if not st.session_state.logged_in:
                         else:
                             st.warning("⚠ No email found for this account. Please contact admin.")
                     
-                        
-                        else:
-                            st.warning("⚠ No email found for this account. Please contact admin.")
                     else:
                         st.error("No matching record found.")
                 except Exception as e:
