@@ -179,7 +179,7 @@ if not st.session_state.logged_in:
                                 st.success(f"✅ Password sent to your registered email: {result['email']}")
                                 print(f"Password sent to: {result['email']}")
                                 st.session_state.show_forgot = False
-                                st.experimental_rerun()  # reload login page
+                                st.rerun()  # reload login page
                         else:
                             st.warning("⚠ No email found for this account. Please contact admin.")
                     else:
