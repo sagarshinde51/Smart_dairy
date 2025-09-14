@@ -2,12 +2,58 @@ import streamlit as st
 import mysql.connector
 import pandas as pd
 import re
+import smtplib
+from email.mime.text import MIMEText
 
 # ----------------- DATABASE CONFIG -----------------
 host = "82.180.143.52"
 user = "u263681140_AttendanceInt"
 password = "SagarAtten@12345"
 database = "u263681140_Attendance"
+# ----------------- BREVO CONFIG -----------------
+SMTP_SERVER = "smtp-relay.brevo.com"
+SMTP_PORT = 587
+
+# Credentials (from Brevo dashboard)
+login_email = st.text_input("Brevo SMTP Login (e.g., 96fca9001@smtp-brevo.com)")
+password = st.text_input("SMTP Key (Master Password)", type="password")
+
+# Fixed sender & receiver
+from_email = "sagar8796841091@gmail.com"   # must be verified in Brevo
+to_email = "sagar9665278681@gmail.com"
+subject = "Smart Dairy Recover Password"
+# ----------------- FUNCTION -----------------
+def send_recovery_mail(password: str, recipient_email: str, message: str) -> bool:
+    """
+    Send a recovery email via Brevo SMTP.
+    
+    Args:
+        password (str): Brevo SMTP Key (Master Password).
+        recipient_email (str): Email address of the recipient.
+        message (str): The recovery email message.
+    
+    Returns:
+        bool: True if email sent successfully, False otherwise.
+    """
+    try:
+        # Create email object
+        msg = MIMEText(message, "plain")
+        msg["From"] = from_email
+        msg["To"] = recipient_email
+        msg["Subject"] = subject
+
+        # Connect & send mail
+        server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
+        server.starttls()
+        server.login(login_email, password)
+        server.sendmail(from_email, recipient_email, msg.as_string())
+        server.quit()
+        return True
+
+    except Exception as e:
+        st.error(f"❌ Failed to send email: {e}")
+        return False
+
 
 def get_connection1():
     return mysql.connector.connect(
@@ -16,6 +62,7 @@ def get_connection1():
         password="SagarAtten@12345",
         database="u263681140_Attendance"
     )
+
 
 
 
@@ -131,8 +178,34 @@ if not st.session_state.logged_in:
 
             user_value = st.text_input(f"Enter your {column_choice}")
 
+            #if st.button("Recover"):
+
             if st.button("Recover"):
                 try:
+                    conn = get_connection1()
+                    cursor = conn.cursor(dictionary=True)
+
+                    # Fetch password + email together
+                    query = f"SELECT password, email FROM Farmers_data WHERE {column_choice} = %s"
+                    cursor.execute(query, (user_value,))
+                    result = cursor.fetchone()
+                    conn.close()
+
+                    if result:
+                        # ✅ Send mail only if email exists in DB
+                        if result["email"]:
+                            recovery_message = f"Hello,\n\nYour Smart Dairy password is: {result['password']}\n\n🐄 Smart Dairy"
+                            smtp_password = st.secrets["brevo_smtp_key"]  # OR ask user input once at top
+                            recipient_email = result["email"]
+
+                            if send_recovery_mail(smtp_password, recipient_email, recovery_message):
+                                st.success(f"✅ Password sent to your registered email: {recipient_email}")
+                        else:
+                            st.warning("⚠ No email found for this account. Please contact admin.")
+                    else:
+                        st.error("No matching record found.")
+                except Exception as e:
+                    st.error(f"Database Error: {e}")                try:
                     conn = get_connection1()
                     cursor = conn.cursor(dictionary=True)
 
@@ -143,6 +216,7 @@ if not st.session_state.logged_in:
 
                     if result:
                         st.success(f"✅ Your password is: {result['password']}")
+                        send_recovery_mail(result['password'], recipient_email, message)
                     else:
                         st.error("No matching record found.")
                 except Exception as e:
