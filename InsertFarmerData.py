@@ -10,40 +10,36 @@ host = "82.180.143.52"
 user = "u263681140_AttendanceInt"
 password = "SagarAtten@12345"
 database = "u263681140_Attendance"
+
 # ----------------- BREVO CONFIG -----------------
 SMTP_SERVER = "smtp-relay.brevo.com"
 SMTP_PORT = 587
 
-# Credentials (from Brevo dashboard)
 # Fixed sender & receiver
 from_email = "sagar8796841091@gmail.com"   # must be verified in Brevo
-to_email = "sagar9665278681@gmail.com"
 subject = "Smart Dairy Recover Password"
-# ----------------- FUNCTION -----------------
+
+# ----------------- FUNCTIONS -----------------
 def send_recovery_mail(recipient_email: str, farmer_password: str) -> bool:
     """
     Send a recovery email with farmer password via Brevo SMTP.
     """
-    SMTP_SERVER = "smtp-relay.brevo.com"
-    SMTP_PORT = 587
     login_email = "96fca9002@smtp-brevo.com"   # From Brevo dashboard
     smtp_password = "DTO6J7N9k2nKRb4t"         # Your SMTP key
 
     try:
-        # Email content
         message = f"""Hello Farmer,
         
-        Your Smart Dairy account password is: {farmer_password}
-        
-        Regards,
-        🐄 Smart Dairy Team
-        """
+Your Smart Dairy account password is: {farmer_password}
+
+Regards,
+🐄 Smart Dairy Team
+"""
         msg = MIMEText(message, "plain")
         msg["From"] = from_email
         msg["To"] = recipient_email
         msg["Subject"] = subject
 
-        # Connect & send
         server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
         server.starttls()
         server.login(login_email, smtp_password)
@@ -55,6 +51,7 @@ def send_recovery_mail(recipient_email: str, farmer_password: str) -> bool:
     except Exception as e:
         st.error(f"❌ Failed to send email: {e}")
         return False
+
 def get_connection1():
     return mysql.connector.connect(
         host="82.180.143.66",
@@ -62,9 +59,6 @@ def get_connection1():
         password="SagarAtten@12345",
         database="u263681140_Attendance"
     )
-
-
-
 
 def get_connection():
     return mysql.connector.connect(
@@ -74,7 +68,6 @@ def get_connection():
         database=database
     )
 
-# Function to fetch data from any table
 def fetch_data(table_name):
     try:
         conn = get_connection()
@@ -86,16 +79,13 @@ def fetch_data(table_name):
         st.error(f"Database Error: {e}")
         return pd.DataFrame()
 
-# Function to insert farmer data
 def insert_farmer(data):
     try:
         conn = get_connection()
         cursor = conn.cursor()
-
         sql = """INSERT INTO Farmers_data 
                  (RFID_no, adhar_no, farmer_name, address, mobile_no, email, password, bank, account_no, IFSC_code, cattle_type)
                  VALUES (%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s)"""
-
         cursor.execute(sql, data)
         conn.commit()
         conn.close()
@@ -104,7 +94,6 @@ def insert_farmer(data):
         st.error(f"Database Error: {e}")
         return False
 
-
 # ----------------- SESSION INIT -----------------
 if "logged_in" not in st.session_state:
     st.session_state.logged_in = False
@@ -112,7 +101,6 @@ if "login_type" not in st.session_state:
     st.session_state.login_type = None
 if "farmer_id" not in st.session_state:
     st.session_state.farmer_id = None
-
 
 # ----------------- LOGIN PAGE -----------------
 if not st.session_state.logged_in:
@@ -133,6 +121,7 @@ if not st.session_state.logged_in:
                 st.rerun()
             else:
                 st.error("Invalid admin username or password")
+
     # --------- FARMER LOGIN ----------
     elif login_type == "Farmer":
         userid = st.text_input("Enter RFID No or Mobile No")
@@ -145,7 +134,6 @@ if not st.session_state.logged_in:
                 try:
                     conn = get_connection1()
                     cursor = conn.cursor(dictionary=True)
-            
                     query = """SELECT * FROM Farmers_data 
                                WHERE (RFID_No = %s OR mobile_no = %s) AND password = %s"""
                     cursor.execute(query, (userid, userid, password))
@@ -170,41 +158,35 @@ if not st.session_state.logged_in:
 
         if "show_forgot" in st.session_state and st.session_state.show_forgot:
             st.subheader("🔑 Recover Password")
-
             column_choice = st.selectbox(
                 "Select recovery option",
                 ["adhar_no", "email", "mobile_no", "RFID_no"]
             )
-
             user_value = st.text_input(f"Enter your {column_choice}")
-
-            #if st.button("Recover"):
 
             if st.button("Recover"):
                 try:
                     conn = get_connection1()
                     cursor = conn.cursor(dictionary=True)
-
-                    # Fetch password + email together
                     query = f"SELECT password, email FROM Farmers_data WHERE {column_choice} = %s"
                     cursor.execute(query, (user_value,))
                     result = cursor.fetchone()
                     conn.close()
 
-                    #
                     if result:
                         if result["email"]:
                             if send_recovery_mail(result["email"], result["password"]):
                                 st.success(f"✅ Password sent to your registered email: {result['email']}")
+                                print(f"Password sent to: {result['email']}")
+                                st.session_state.show_forgot = False
+                                st.experimental_rerun()  # reload login page
                         else:
                             st.warning("⚠ No email found for this account. Please contact admin.")
-                    
                     else:
                         st.error("No matching record found.")
                 except Exception as e:
-                    st.error(f"Database Error: {e}")                
-                
-                
+                    st.error(f"Database Error: {e}")
+
 # ----------------- AFTER LOGIN -----------------
 if st.session_state.logged_in:
 
@@ -236,7 +218,6 @@ if st.session_state.logged_in:
         # TAB 2 - Farmer Registration
         with tab2:
             st.header("📝 Farmer Registration Form")
-
             with st.form("farmer_form"):
                 RFID_no = st.text_input("RFID Number")
                 adhar_no = st.text_input("Aadhar No (12 digits)")
@@ -291,7 +272,6 @@ if st.session_state.logged_in:
             else:
                 st.info("No Farmers found.")
 
-
     # ----------------- FARMER DASHBOARD -----------------
     elif st.session_state.login_type == "Farmer":
         tab1, tab2, tab3 = st.tabs(["🥛 My Milk Records", "👤 My Profile", "✏️ Update Info"])
@@ -332,11 +312,10 @@ if st.session_state.logged_in:
             except Exception as e:
                 st.error(f"Database Error: {e}")
 
-        # TAB 3 - Update Info (future feature)
+        # TAB 3 - Update Info
         with tab3:
             st.header("✏️ Update Info")
             st.info("This section can be used to update farmer details (not implemented yet).")
-
 
     # ----------------- LOGOUT -----------------
     st.markdown("---")
@@ -346,3 +325,4 @@ if st.session_state.logged_in:
         st.session_state.farmer_id = None
         st.success("Logged out successfully!")
         st.rerun()
+
