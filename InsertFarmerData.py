@@ -15,9 +15,6 @@ SMTP_SERVER = "smtp-relay.brevo.com"
 SMTP_PORT = 587
 
 # Credentials (from Brevo dashboard)
-login_email = st.text_input("Brevo SMTP Login (e.g., 96fca9001@smtp-brevo.com)")
-password = st.text_input("SMTP Key (Master Password)", type="password")
-
 # Fixed sender & receiver
 from_email = "sagar8796841091@gmail.com"   # must be verified in Brevo
 to_email = "sagar9665278681@gmail.com"
