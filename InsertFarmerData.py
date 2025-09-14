@@ -20,38 +20,41 @@ from_email = "sagar8796841091@gmail.com"   # must be verified in Brevo
 to_email = "sagar9665278681@gmail.com"
 subject = "Smart Dairy Recover Password"
 # ----------------- FUNCTION -----------------
-def send_recovery_mail(password: str, recipient_email: str, message: str) -> bool:
+def send_recovery_mail(recipient_email: str, farmer_password: str) -> bool:
     """
-    Send a recovery email via Brevo SMTP.
-    
-    Args:
-        password (str): Brevo SMTP Key (Master Password).
-        recipient_email (str): Email address of the recipient.
-        message (str): The recovery email message.
-    
-    Returns:
-        bool: True if email sent successfully, False otherwise.
+    Send a recovery email with farmer password via Brevo SMTP.
     """
+    SMTP_SERVER = "smtp-relay.brevo.com"
+    SMTP_PORT = 587
+    login_email = "96fca9002@smtp-brevo.com"   # From Brevo dashboard
+    smtp_password = "DTO6J7N9k2nKRb4t"         # Your SMTP key
+
     try:
-        # Create email object
+        # Email content
+        message = f"""Hello Farmer,
+        
+        Your Smart Dairy account password is: {farmer_password}
+        
+        Regards,
+        🐄 Smart Dairy Team
+        """
         msg = MIMEText(message, "plain")
         msg["From"] = from_email
         msg["To"] = recipient_email
         msg["Subject"] = subject
 
-        # Connect & send mail
+        # Connect & send
         server = smtplib.SMTP(SMTP_SERVER, SMTP_PORT)
         server.starttls()
-        server.login(login_email, password)
+        server.login(login_email, smtp_password)
         server.sendmail(from_email, recipient_email, msg.as_string())
         server.quit()
+
         return True
 
     except Exception as e:
         st.error(f"❌ Failed to send email: {e}")
         return False
-
-
 def get_connection1():
     return mysql.connector.connect(
         host="82.180.143.66",
