@@ -85,6 +85,8 @@ if not st.session_state.logged_in:
         if st.button("Login as Farmer"):
             try:
                 conn = get_connection()
+
+
                 
                 host = "82.180.143.52"
                 user = "u263681140_AttendanceInt"
@@ -97,7 +99,7 @@ if not st.session_state.logged_in:
                     (userid, userid, password)
                 )
                 farmer = cursor.fetchone()
-                conn.close()
+                #conn.close()
 
                 if farmer:
                     st.session_state.logged_in = True
