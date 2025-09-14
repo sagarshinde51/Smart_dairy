@@ -203,24 +203,8 @@ if not st.session_state.logged_in:
                         st.error("No matching record found.")
                 except Exception as e:
                     st.error(f"Database Error: {e}")                
-                try:
-                    conn = get_connection1()
-                    cursor = conn.cursor(dictionary=True)
-
-                    query = f"SELECT password FROM Farmers_data WHERE {column_choice} = %s"
-                    cursor.execute(query, (user_value,))
-                    result = cursor.fetchone()
-                    conn.close()
-
-                    if result:
-                        st.success(f"✅ Your password is: {result['password']}")
-                        send_recovery_mail(result['password'], recipient_email, message)
-                    else:
-                        st.error("No matching record found.")
-                except Exception as e:
-                    st.error(f"Database Error: {e}")
-
-
+                
+                
 # ----------------- AFTER LOGIN -----------------
 if st.session_state.logged_in:
 
