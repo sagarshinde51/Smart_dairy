@@ -85,27 +85,18 @@ if not st.session_state.logged_in:
         if st.button("Login as Farmer"):
             try:
                 conn = get_connection()
-
-
-                
-                host = "82.180.143.52"
-                user = "u263681140_AttendanceInt"
-                password = "SagarAtten@12345"
-                database = "u263681140_Attendance"
-
                 cursor = conn.cursor(dictionary=True)
-                cursor.execute(
-                    "SELECT * FROM Farmers_data WHERE (RFID_no=%s OR mobile_no=%s) AND password=%s",
-                    (userid, userid, password)
-                )
-                farmer = cursor.fetchone()
+        
+                query = """SELECT * FROM Farmers_data 
+                           WHERE (RFID_No = %s OR mobile_no = %s) AND password = %s"""
+                cursor.execute(query, (userid, userid, password))
+                result = cursor.fetchone()
                 #conn.close()
-
-                if farmer:
+                if result:
                     st.session_state.logged_in = True
                     st.session_state.login_type = "Farmer"
-                    st.session_state.farmer_id = farmer["RFID_no"]
-                    st.success(f"✅ Welcome, {farmer['farmer_name']}!")
+                    st.session_state.farmer_id = result["RFID_no"]
+                    st.success(f"✅ Welcome, {result['farmer_name']}!")
                     st.rerun()
                 else:
                     st.error("Invalid credentials")
