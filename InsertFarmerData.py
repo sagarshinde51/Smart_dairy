@@ -9,6 +9,16 @@ user = "u263681140_AttendanceInt"
 password = "SagarAtten@12345"
 database = "u263681140_Attendance"
 
+def get_connection1():
+    return mysql.connector.connect(
+        host="82.180.143.66",
+        user="u263681140_AttendanceInt",
+        password="SagarAtten@12345",
+        database="u263681140_Attendance"
+    )
+
+
+
 def get_connection():
     return mysql.connector.connect(
         host=host,
@@ -84,7 +94,7 @@ if not st.session_state.logged_in:
 
         if st.button("Login as Farmer"):
             try:
-                conn = get_connection()
+                conn = get_connection1()
                 cursor = conn.cursor(dictionary=True)
         
                 query = """SELECT * FROM Farmers_data 
