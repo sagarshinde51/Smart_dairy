@@ -86,32 +86,67 @@ if not st.session_state.logged_in:
                 st.rerun()
             else:
                 st.error("Invalid admin username or password")
-
     # --------- FARMER LOGIN ----------
     elif login_type == "Farmer":
         userid = st.text_input("Enter RFID No or Mobile No")
         password = st.text_input("Password", type="password")
 
-        if st.button("Login as Farmer"):
-            try:
-                conn = get_connection1()
-                cursor = conn.cursor(dictionary=True)
-        
-                query = """SELECT * FROM Farmers_data 
-                           WHERE (RFID_No = %s OR mobile_no = %s) AND password = %s"""
-                cursor.execute(query, (userid, userid, password))
-                result = cursor.fetchone()
-                #conn.close()
-                if result:
-                    st.session_state.logged_in = True
-                    st.session_state.login_type = "Farmer"
-                    st.session_state.farmer_id = result["RFID_no"]
-                    st.success(f"✅ Welcome, {result['farmer_name']}!")
-                    st.rerun()
-                else:
-                    st.error("Invalid credentials")
-            except Exception as e:
-                st.error(f"Database Error: {e}")
+        col1, col2 = st.columns(2)
+
+        with col1:
+            if st.button("Login as Farmer"):
+                try:
+                    conn = get_connection1()
+                    cursor = conn.cursor(dictionary=True)
+            
+                    query = """SELECT * FROM Farmers_data 
+                               WHERE (RFID_No = %s OR mobile_no = %s) AND password = %s"""
+                    cursor.execute(query, (userid, userid, password))
+                    result = cursor.fetchone()
+                    conn.close()
+
+                    if result:
+                        st.session_state.logged_in = True
+                        st.session_state.login_type = "Farmer"
+                        st.session_state.farmer_id = result["RFID_no"]
+                        st.success(f"✅ Welcome, {result['farmer_name']}!")
+                        st.rerun()
+                    else:
+                        st.error("Invalid credentials")
+                except Exception as e:
+                    st.error(f"Database Error: {e}")
+
+        # --------- FORGOT PASSWORD FEATURE ----------
+        with col2:
+            if st.button("Forgot Password"):
+                st.session_state.show_forgot = True
+
+        if "show_forgot" in st.session_state and st.session_state.show_forgot:
+            st.subheader("🔑 Recover Password")
+
+            column_choice = st.selectbox(
+                "Select recovery option",
+                ["adhar_no", "email", "mobile_no", "RFID_no"]
+            )
+
+            user_value = st.text_input(f"Enter your {column_choice}")
+
+            if st.button("Recover"):
+                try:
+                    conn = get_connection1()
+                    cursor = conn.cursor(dictionary=True)
+
+                    query = f"SELECT password FROM Farmers_data WHERE {column_choice} = %s"
+                    cursor.execute(query, (user_value,))
+                    result = cursor.fetchone()
+                    conn.close()
+
+                    if result:
+                        st.success(f"✅ Your password is: {result['password']}")
+                    else:
+                        st.error("No matching record found.")
+                except Exception as e:
+                    st.error(f"Database Error: {e}")
 
 
 # ----------------- AFTER LOGIN -----------------
