@@ -85,6 +85,12 @@ if not st.session_state.logged_in:
         if st.button("Login as Farmer"):
             try:
                 conn = get_connection()
+                
+                host = "82.180.143.52"
+                user = "u263681140_AttendanceInt"
+                password = "SagarAtten@12345"
+                database = "u263681140_Attendance"
+
                 cursor = conn.cursor(dictionary=True)
                 cursor.execute(
                     "SELECT * FROM Farmers_data WHERE (RFID_no=%s OR mobile_no=%s) AND password=%s",
