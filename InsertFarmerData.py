@@ -205,12 +205,13 @@ if not st.session_state.logged_in:
                     else:
                         st.error("No matching record found.")
                 except Exception as e:
-                    st.error(f"Database Error: {e}")                try:
+                    st.error(f"Database Error: {e}")                
+                try:
                     conn = get_connection1()
                     cursor = conn.cursor(dictionary=True)
 
                     query = f"SELECT password FROM Farmers_data WHERE {column_choice} = %s"
-                    cursor.execute(query, (user_value,))
+                    cursor.execute(query, (user_value,)
                     result = cursor.fetchone()
                     conn.close()
 
