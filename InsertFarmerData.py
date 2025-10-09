@@ -223,7 +223,7 @@ if st.session_state.logged_in:
                 adhar_no = st.text_input("Aadhar No (12 digits)")
                 farmer_name = st.text_input("Farmer Name")
                 address = st.text_area("Address")
-                mobile_no = st.text_input("Mobile No (10 digits)")
+                mobile_no = st.text_input("Mobile No (12 digits with 91)")
                 email = st.text_input("Email Address")
                 password1 = st.text_input("Password", type="password")
                 password2 = st.text_input("Confirm Password", type="password")
