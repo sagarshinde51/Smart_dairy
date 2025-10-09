@@ -248,7 +248,7 @@ if st.session_state.logged_in:
                     if not re.match(r"^[0-9]{12}$", adhar_no):
                         st.error("Aadhar must be 12 digits")
                     elif not re.match(r"^[0-9]{12}$", mobile_no):
-                        st.error("Mobile number must be 10 digits")
+                        st.error("Mobile number must be 12(start With 91) digits")
                     elif "@" not in email:
                         st.error("Invalid email address")
                     elif password1 != password2:
